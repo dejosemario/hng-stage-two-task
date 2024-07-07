@@ -1,12 +1,12 @@
 const { Pool } = require("pg");
-
+const { Sequelize, DataTypes } = require('sequelize');
 const dotenv = require("dotenv");
 const { Connector } = require("@google-cloud/cloud-sql-connector");
+const createSequelizeInstance = require("./db.sequelize");
 dotenv.config({ path: ".env" });
 
 const connector = new Connector();
 
-console.log(process.env.GOOGLE_APPLICATION_CREDENTIALS);
 
 const clientOpts = async function () {
   return await connector.getOptions({
@@ -37,6 +37,9 @@ async function createPool() {
 
   return pool;
 }
+
+createSequelizeInstance()
+
 
 createPool()
   .then((pool) => {
