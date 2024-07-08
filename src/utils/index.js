@@ -1,4 +1,5 @@
 const { ValidationErrorItem } = require("sequelize");
+const bcrypt = require("bcrypt");
 
 const wrapper = (fn) => {
   return async (req, res, next) => {
@@ -22,7 +23,12 @@ const validate = (schema, body) => {
   }
 };
 
+const hashPassword = (password) => {
+  return bcrypt.hash(password, 10);
+};
+
 module.exports({
   wrapper,
   validate,
+  hashPassword
 });
