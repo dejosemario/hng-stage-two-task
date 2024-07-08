@@ -1,51 +1,42 @@
-const { Pool } = require("pg");
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize } = require("sequelize");
 const dotenv = require("dotenv");
 const { Connector } = require("@google-cloud/cloud-sql-connector");
-const createSequelizeInstance = require("./db.sequelize");
+
 dotenv.config({ path: ".env" });
 
 const connector = new Connector();
 
-
-const clientOpts = async function () {
-  return await connector.getOptions({
+async function createSequelizeInstance() {
+  const clientOpts = await connector.getOptions({
     instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
     ipType: "PUBLIC",
   });
-};
 
-async function createPool() {
-  const opts = await clientOpts();
-
-  const pool = new Pool({
-    ...opts,
-    user: process.env.PGUSER,
+  const sequelize = new Sequelize({
+    dialect: "postgres",
+    username: process.env.PGUSER,
     database: process.env.PGDATABASE,
     password: process.env.PGPASSWORD,
-    max: 5,
+    dialectOptions: {
+      stream: clientOpts.stream, // Ensure this is correctly set
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 60000, // Increased acquire timeout
+      idle: 20000, // Increased idle timeout
+    },
   });
 
-  // Example query
-  pool.query("SELECT NOW()", (err, res) => {
-    if (err) {
-      console.error("Error executing query", err);
-      return;
-    }
-    console.log("Current date and time from PostgreSQL:", res.rows[0].now);
-  });
+  // Test the connection
+  try {
+    await sequelize.authenticate();
+    console.log("Connection has been established successfully.");
+  } catch (err) {
+    console.log("Unable to connect to the database:", err);
+  }
 
-  return pool;
+  return sequelize;
 }
 
-createSequelizeInstance()
-
-
-createPool()
-  .then((pool) => {
-    console.log("Pool created successfully")
-    module.exports = pool;
-  })
-  .catch((err) => {
-    console.error("Error with the pool", err);
-  });
+module.exports = createSequelizeInstance;
