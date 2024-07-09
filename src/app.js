@@ -1,23 +1,25 @@
 const express = require("express");
-const {errorHandler} = require("./middlewares/error.js");
-const morgan = require('morgan');
-const createSequelizeInstance = require("./config/db.js");
+const { errorHandler } = require("./middlewares/error.js");
+const morgan = require("morgan");
+// const organisations = require("./routes/organisation.route.js");
+// const users = require("./routes/user.route.js");
+const authRoute = require("./routes/auth.route.js");
 
 // Create a new express application
 const app = express();
 
 // Use the express.json() middleware to parse the request body
-app.use(express.json());//
-app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(express.json()); //
+// app.use(express.urlencoded({ extended: true }));
+app.use(morgan("dev"));
 
 //Routes
-// app.use("/api/auth", require("./routes/auth"));
-// app.use("/api/users", require("./routes/users"));
-// app.use("/api/organizations", require("./routes/organizations"));
+app.use("/auth", authRoute);
+// app.use("/users", users);
+// app.use("/organisations", organisations);
+
 
 app.use(errorHandler);
-createSequelizeInstance()
 
 
 // Error handling middleware

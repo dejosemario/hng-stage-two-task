@@ -6,7 +6,7 @@ dotenv.config({ path: ".env" });
 
 const connector = new Connector();
 
-async function createSequelizeInstance() {
+ async function createSequelizeInstance() {
   const clientOpts = await connector.getOptions({
     instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
     ipType: "PUBLIC",
@@ -14,11 +14,14 @@ async function createSequelizeInstance() {
 
   const sequelize = new Sequelize({
     dialect: "postgres",
-    username: process.env.PGUSER,
+    username: process.env.PGUSER,    
+
     database: process.env.PGDATABASE,
     password: process.env.PGPASSWORD,
+    host: clientOpts.host,
+    port: clientOpts.port,
     dialectOptions: {
-      stream: clientOpts.stream, // Ensure this is correctly set
+      socketPath: process.env.INSTANCE_UNIX_SOCKET,
     },
     pool: {
       max: 5,
@@ -26,6 +29,7 @@ async function createSequelizeInstance() {
       acquire: 60000, // Increased acquire timeout
       idle: 20000, // Increased idle timeout
     },
+    logging: false, 
   });
 
   // Test the connection
@@ -37,6 +41,7 @@ async function createSequelizeInstance() {
   }
 
   return sequelize;
-}
+};
+
 
 module.exports = createSequelizeInstance;
