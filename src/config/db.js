@@ -17,9 +17,9 @@ const connector = new Connector();
     username: process.env.PGUSER,    
 
     database: process.env.PGDATABASE,
-    password: process.env.PGPASSWORD,
+    password: proceses.env.PGPASSWORD,
     host: clientOpts.host,
-    port: clientOpts.port,
+    port: proceses.env.PG_PORT,
     dialectOptions: {
       socketPath: process.env.INSTANCE_UNIX_SOCKET,
     },

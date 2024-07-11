@@ -46,7 +46,7 @@ User.associate = function (models) {
   User.belongsToMany(models.Organisation, {
     through: "UserOrganisations",
     as: "organisations",
-    foreignKey: "userId",
+    foreignKey: "userId", 
   });
 };
 
